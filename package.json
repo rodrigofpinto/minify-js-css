@@ -1,0 +1,71 @@
+{
+  "name": "minify-js-css",
+  "displayName": "Minify JS & CSS",
+  "description": "Minifies JavaScript and CSS files",
+  "publisher": "rodrigofpinto",
+  "icon": "icon.png",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "minify-js-css.minify",
+        "title": "Minify File (CSS/JS)" 
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "resourceExtname == .css || resourceExtname == .js",
+          "command": "minify-js-css.minify",
+          "group": "2_workspace"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/clean-css": "^4.2.11",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "24.x",
+    "@types/terser": "^3.8.1",
+    "@types/vscode": "^1.125.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0",
+    "eslint": "^10.5.0",
+    "ts-loader": "^9.6.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "webpack": "^5.107.2",
+    "webpack-cli": "^7.0.3"
+  },
+  "overrides": {
+    "diff": "^8.0.4",
+    "serialize-javascript": "^7.0.6"
+  },
+  "dependencies": {
+    "clean-css": "^5.3.3",
+    "terser": "^5.50.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rodrigofpinto/minify-js-css"
+  }
+}
