@@ -17,7 +17,7 @@
     "commands": [
       {
         "command": "minify-js-css.minify",
-        "title": "Minify File (CSS/JS)" 
+        "title": "Minify File (CSS/JS)"
       }
     ],
     "menus": {
@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "clean-css": "^5.3.3",
-    "terser": "^5.50.0"
+    "esbuild": "^0.28.2"
   },
   "repository": {
     "type": "git",

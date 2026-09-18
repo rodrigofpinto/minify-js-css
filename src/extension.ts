@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import CleanCSS = require('clean-css');
+import * as esbuild from 'esbuild';
 
 export function activate(context: vscode.ExtensionContext) {
-    
     let disposable = vscode.commands.registerCommand('minify-js-css.minify', async (uri: vscode.Uri) => {
         if (!uri || !uri.fsPath) {
             vscode.window.showErrorMessage('No file selected.');
@@ -20,10 +20,10 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         try {
-            const fileContent = fs.readFileSync(inputPath, 'utf8');
             let outputCode = '';
-            
+
             if (parsedPath.ext === '.css') {
+                const fileContent = fs.readFileSync(inputPath, 'utf8');
                 const cleanCssOutput = new CleanCSS({
                     rebaseTo: parsedPath.dir 
                 }).minify({ [inputPath]: { styles: fileContent } });
@@ -35,9 +35,16 @@ export function activate(context: vscode.ExtensionContext) {
                 outputCode = cleanCssOutput.styles;
 
             } else if (parsedPath.ext === '.js') {
-                const Terser = await import('terser');
-                const terserResult = await Terser.minify(fileContent);
-                outputCode = terserResult.code || '';
+                const result = await esbuild.build({
+                    entryPoints: [inputPath],
+                    bundle: true,
+                    minify: true,
+                    write: false,
+                    absWorkingDir: parsedPath.dir, 
+                    format: 'iife',
+                });
+
+                outputCode = result.outputFiles[0].text;
 
             } else {
                 vscode.window.showErrorMessage('File format not supported.');
@@ -46,11 +53,11 @@ export function activate(context: vscode.ExtensionContext) {
 
             const outputPath = path.join(parsedPath.dir, `${parsedPath.name}.min${parsedPath.ext}`);
             fs.writeFileSync(outputPath, outputCode);
-
-            vscode.window.showInformationMessage(`${parsedPath.ext.toUpperCase()} minified successfully! Generated: ${parsedPath.name}.min${parsedPath.ext}`);
+            vscode.window.showInformationMessage(`Esbuild bundled & minified: ${parsedPath.name}.min${parsedPath.ext}`);
 
         } catch (error: any) {
-            vscode.window.showErrorMessage(`Error minifying: ${error.message}`);
+            const errorMessage = error.errors ? error.errors.map((e: any) => e.text).join(', ') : error.message;
+            vscode.window.showErrorMessage(`Error minifying: ${errorMessage}`);
         }
     });
 
